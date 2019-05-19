@@ -6,7 +6,6 @@ import cn.judgchen.cisp.common.model.response.ApiResponse;
 import cn.judgchen.cisp.dao.CalouselsRepository;
 import cn.judgchen.cisp.entity.Calouels;
 import cn.judgchen.cisp.service.CalouselsService;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

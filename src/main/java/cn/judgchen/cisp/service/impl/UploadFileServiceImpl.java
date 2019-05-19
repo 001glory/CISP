@@ -71,7 +71,9 @@ public class UploadFileServiceImpl implements UploadFileService {
             LOG.info("成功上传!"+fileUrl);
             return fileUrl;
         } catch (Exception e) {
-            return dest.toString();
+            System.out.println("文件太大！");
+            e.printStackTrace();
+            return "文件太大了！";
         }
     }
 

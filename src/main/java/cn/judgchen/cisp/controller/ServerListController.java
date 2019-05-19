@@ -51,13 +51,14 @@ public class ServerListController {
         serverList.setOrderNum(orderNum);
         serverList.setCreateTime(createTime);
 //        System.out.println(orderNum);
-        serverList.setState(1);
+        serverList.setState(0);
         serverList.setIsDelete(0);
         serverList.setIsPay(0);
         ServerList serverList1 = serverListService.selectByOrderNum(serverList.getOrderNum());
         if(serverList1==null){
             serverListService.addServerInfo(serverList);
-            return ApiResponse.success(serverList);
+            ServerList serverList2 = serverListService.selectByOrderNum(serverList.getOrderNum());
+            return ApiResponse.success(serverList2);
         }else {
             return ApiResponse.fail(ConstanCode.ORDER_ALREADY_EXISTS);
         }
@@ -74,6 +75,32 @@ public class ServerListController {
         System.out.println("修盖耗时：#############"+(endTime-startTime));
         return ApiResponse.success();
     }
+
+    @PostMapping("/update/state")
+    @LoggerManage(description = "模拟支付")
+    public ApiResponse pay(int id){
+        if (serverListRepository.findById(id) != null){
+           LocalDateTime payTime = LocalDateTime.now();
+            serverListRepository.pay(id,payTime);
+            return ApiResponse.success(id);
+        }else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+    }
+
+
+    @PostMapping("/pay")
+    @LoggerManage(description = "模拟支付")
+    public ApiResponse payment(int id,int totalFee){
+        if (serverListRepository.findById(id) != null){
+            LocalDateTime payTime = LocalDateTime.now();
+            serverListRepository.payment(id,payTime,totalFee);
+            return ApiResponse.success(id);
+        }else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+    }
+
 
     @PostMapping("/get")
     @LoggerManage(description = "获取帮助列表")
@@ -214,13 +241,24 @@ public class ServerListController {
     @LoggerManage(description = "取消订单")
     public ApiResponse cancelOrder(int id){
         if (serverListRepository.findById(id) != null){
-            serverListRepository.cancelOrder(id);
+            LocalDateTime cancelTime = LocalDateTime.now();
+            serverListRepository.cancelOrder(id,cancelTime);
             return ApiResponse.success();
         } else {
             return ApiResponse.fail(new ErrorCode(100,"取消失败"));
         }
+    }
 
-
+    @PostMapping("/confirm")
+    @LoggerManage(description = "确认订单")
+    public ApiResponse confirm(int id){
+        if (serverListRepository.findById(id) != null){
+            LocalDateTime comTime = LocalDateTime.now();
+            serverListRepository.confirm(id,comTime);
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
     }
 
     @PostMapping("/getExpress")

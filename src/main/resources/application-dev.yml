@@ -18,3 +18,16 @@ server:
 file:
   path: D:/img/
   sonPath: /img/
+#file:
+#  path: /usr/img
+#  sonPath: /usr/img
+
+
+#img:
+#  local:
+#    path: /usr/img/
+#  Host: http://judgchen.cn
+img:
+  local:
+    path: D:/img/
+  Host: http://localhost:8080

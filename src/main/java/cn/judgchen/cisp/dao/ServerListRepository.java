@@ -100,8 +100,8 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long> {
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("update ServerList set state=4 where id=:id")
-    void cancelOrder(@Param("id") int id);
+    @Query("update ServerList set isPay=0,state=4,cancelTime=:cancelTime where id=:id")
+    void cancelOrder(@Param("id") int id,@Param("cancelTime") LocalDateTime cancelTime);
 
     @Transactional
     @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like '%快递代取%' AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
@@ -111,4 +111,19 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long> {
     @Transactional
     @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like '%打印%' AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
     List<Map<String,Object>> getPrint(@Param("aId") int aId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update ServerList set isPay=1,state=1,payTime=:payTime where id=:id")
+    void pay(@Param("id") int id,@Param("payTime") LocalDateTime payTime);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update ServerList set isPay=1,state=1,payTime=:payTime,totalFee=:totalFee where id=:id")
+    void payment(@Param("id") int id,@Param("payTime") LocalDateTime payTime,@Param("totalFee") double totalFee);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update ServerList set state=3,comTime=:comTime where id=:id")
+    void confirm(@Param("id") int id, @Param("comTime") LocalDateTime comTime);
 }
