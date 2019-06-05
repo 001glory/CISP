@@ -87,4 +87,14 @@ public class CalouselsController {
             return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
         }
     }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "模糊查询轮播图")
+    public ApiResponse getCalousels(String company,Integer sort,int page,int size){
+        Calouels calouel = new Calouels();
+        calouel.setCompany(company);
+        calouel.setSort(sort);
+        Page<Calouels> calouels = calouselsService.getALL(calouel,page,size);
+        return ApiResponse.success(calouels);
+    }
 }

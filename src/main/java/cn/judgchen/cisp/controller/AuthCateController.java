@@ -75,4 +75,13 @@ public class AuthCateController {
         }
 
     }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "模糊查询")
+    public ApiResponse getByName(String cateName,int page,int size){
+
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"id");
+        Page<AuthCate> authCates =  authCateRepository.findByName(cateName,pageable);
+        return ApiResponse.success(authCates);
+    }
 }

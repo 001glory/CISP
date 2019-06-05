@@ -21,4 +21,9 @@ public interface AuthsRepository extends JpaRepository<Auths,Long> {
     void update(@Param("isDelete") int isDelete,@Param("id") int id);
 
     Auths findAuthsById(int id);
+
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select * from auths where is_delete =0 and auth_name like CONCAT('%',:authName,'%')")
+    Page<Auths> findAuthsByName(@Param("authName") String authName, Pageable pageable);
 }

@@ -4,6 +4,7 @@ import cn.judgchen.cisp.entity.Calouels;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface CalouselsRepository extends JpaRepository<Calouels,Long> {
+public interface CalouselsRepository extends JpaRepository<Calouels,Long>, JpaSpecificationExecutor<Calouels> {
 
     @Query(nativeQuery = true,value = "select *from calousels where is_show=1 and is_delete=0 and a_id =:aId")
     List<Calouels> findCalouels(@Param("aId") int aId);

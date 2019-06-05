@@ -59,8 +59,16 @@ public class AuthsController {
     public ApiResponse getList(int page,int size,int roleId){
         Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"id");
         Page<Auths> auths = authsRepository.findAuths(0,pageable);
-
         return ApiResponse.success(auths);
     }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "获取相应的权限路径")
+    public ApiResponse getListByName(String authName,int page,int size){
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"id");
+        Page<Auths> auths = authsRepository.findAuthsByName(authName,pageable);
+        return ApiResponse.success(auths);
+    }
+
 
 }

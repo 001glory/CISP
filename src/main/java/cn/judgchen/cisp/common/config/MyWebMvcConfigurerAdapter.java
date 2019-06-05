@@ -13,7 +13,8 @@ public class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
         //指向外部目录
-        registry.addResourceHandler("img//**").addResourceLocations("file:"+filePath);
+        registry.addResourceHandler("/usr/img//**").addResourceLocations("file:"+filePath);
+        registry.addResourceHandler("/img//**").addResourceLocations("file:"+filePath);
         super.addResourceHandlers(registry);
     }
 }

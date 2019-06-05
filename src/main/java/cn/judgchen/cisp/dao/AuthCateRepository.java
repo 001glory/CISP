@@ -18,6 +18,10 @@ public interface AuthCateRepository extends JpaRepository<AuthCate,Long> {
     Page<AuthCate> findAll(@Param("isDelete") int isDelete, Pageable pageable);
 
     @Transactional
+    @Query(nativeQuery = true,value = "select * from auth_cate where  is_delete =0 and cate_name like CONCAT('%',:cateName,'%')")
+    Page<AuthCate> findByName(@Param("cateName") String cateName, Pageable pageable);
+
+    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update AuthCate set isDelete =1 where id =:id")
     void update(@Param("id") int id);

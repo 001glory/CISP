@@ -3,6 +3,7 @@ package cn.judgchen.cisp.controller;
 import cn.judgchen.cisp.common.aop.LoggerManage;
 import cn.judgchen.cisp.common.code.ConstanCode;
 import cn.judgchen.cisp.common.model.response.ApiResponse;
+import cn.judgchen.cisp.dao.CapitalTrendrepository;
 import cn.judgchen.cisp.dao.CashRepository;
 import cn.judgchen.cisp.dao.WalletsRepository;
 import cn.judgchen.cisp.entity.Cash;
@@ -26,6 +27,9 @@ public class WalletsController {
     @Autowired
     private CashRepository cashRepository;
 
+    @Autowired
+    private CapitalTrendrepository capitalTrendrepository;
+    
 
     @PostMapping("/get")
     @LoggerManage(description = "获取钱包的信息")
@@ -80,9 +84,6 @@ public class WalletsController {
         } else {
             return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
         }
-
-
-
     }
 
 }

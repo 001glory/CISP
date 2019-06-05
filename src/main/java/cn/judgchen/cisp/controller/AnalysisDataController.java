@@ -41,10 +41,7 @@ public class AnalysisDataController {
         analysisData.setTurnoverDaily(serverListRepository.getDailySale());
         analysisData.setTurnoverMonth(serverListRepository.getMonthSale());
         analysisData.setTurnoverYear(serverListRepository.getYearSale());
-        analysisData.setRefund(serverListRepository.getRefund());
-        analysisData.setRefundDaily(serverListRepository.getRefundDaily());
-        analysisData.setRefundMonth(serverListRepository.getRefundMonth());
-        analysisData.setRefundYear(serverListRepository.getRefundYear());
+        analysisData.setDailyUser(wxUserRepository.getDailyUser());
 
         return ApiResponse.success(analysisData);
     }

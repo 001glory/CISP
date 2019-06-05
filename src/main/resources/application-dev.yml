@@ -14,20 +14,23 @@ spring:
       multipart:
         max-file-size: 10Mb
 server:
-  port: 8080
+#  port: 8080
+  port: 81
+  servlet:
+    context-path: /cisp/
 file:
   path: D:/img/
   sonPath: /img/
 #file:
-#  path: /usr/img
-#  sonPath: /usr/img
+#  path: /usr/img/
+#  sonPath: /img/
 
 
 #img:
 #  local:
 #    path: /usr/img/
-#  Host: http://judgchen.cn
+#  Host: http://47.103.7.106:80/cisp
 img:
   local:
     path: D:/img/
-  Host: http://localhost:8080
+  Host: http://localhost:8080/cisp

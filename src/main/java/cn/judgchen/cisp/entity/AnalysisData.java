@@ -25,13 +25,7 @@ public class AnalysisData implements Serializable {
 
     private double turnoverYear;
 
-    private double refund;
-
-    private double refundDaily;
-
-    private double refundMonth;
-
-    private double refundYear;
+    private Integer dailyUser;
 
     private Integer wxuserTotalDaily;
 

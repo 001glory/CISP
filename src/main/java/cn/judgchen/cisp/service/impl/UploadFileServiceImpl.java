@@ -26,6 +26,11 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Value("${file.path}")
     private String ROOT_PATH;
 
+
+    //文件网络访问路径
+    @Value("${img.host}")
+    private String imgHost;
+
     @Value("${server.port}")
     //获取主机端口
     private String PORT;
@@ -67,7 +72,7 @@ public class UploadFileServiceImpl implements UploadFileService {
             //transferTo（dest）方法将上传文件写到服务器上指定的文件
             file.transferTo(dest);
             String filePathNew = SON_PATH + fileName;
-            String fileUrl = "http://localhost"+":"+PORT+filePathNew;
+            String fileUrl = imgHost+filePathNew;
             LOG.info("成功上传!"+fileUrl);
             return fileUrl;
         } catch (Exception e) {

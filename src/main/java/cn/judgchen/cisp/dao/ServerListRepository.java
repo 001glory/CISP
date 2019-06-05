@@ -7,6 +7,7 @@ import cn.judgchen.cisp.entity.ServerList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-public interface ServerListRepository extends JpaRepository<ServerList,Long> {
+public interface ServerListRepository extends JpaRepository<ServerList,Long>, JpaSpecificationExecutor<ServerList> {
 
     ServerList findByOrderNum(String orderNum);
 
@@ -47,22 +48,6 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long> {
     @Transactional
     @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and YEAR(create_time)=YEAR(NOW())")
     double getYearSale();
-
-    @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state = 4 and is_pay=1")
-    double getRefund();
-
-    @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state = 4 and is_pay=1 and to_days(create_time) = to_days(now())")
-    double getRefundDaily();
-
-    @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state = 4 and is_pay=1 and DATE_FORMAT( create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )")
-    double getRefundMonth();
-
-    @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state = 4 and is_pay=1 and YEAR(create_time)=YEAR(NOW())")
-    double getRefundYear();
 
     @Transactional
     @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.state in (1,2,3) AND helplist.wx_id=:wxId")
@@ -104,13 +89,13 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long> {
     void cancelOrder(@Param("id") int id,@Param("cancelTime") LocalDateTime cancelTime);
 
     @Transactional
-    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like '%快递代取%' AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
-    List<Map<String,Object>> getExpress(@Param("aId") int aId);
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like CONCAT('%',:name,'%') AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
+    List<Map<String,Object>> getExpress(@Param("aId") int aId,@Param("name")String name);
 
 
     @Transactional
-    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like '%打印%' AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
-    List<Map<String,Object>> getPrint(@Param("aId") int aId);
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like CONCAT('%',:name,'%') AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId")
+    List<Map<String,Object>> getPrint(@Param("aId") int aId,@Param("name")String name);
 
     @Transactional
     @Modifying(clearAutomatically = true)
@@ -126,4 +111,29 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long> {
     @Modifying(clearAutomatically = true)
     @Query("update ServerList set state=3,comTime=:comTime where id=:id")
     void confirm(@Param("id") int id, @Param("comTime") LocalDateTime comTime);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update ServerList set isDelete=1 where id=:id")
+    void deleteServerList(@Param("id") Integer id);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like CONCAT('%',:name,'%') AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId AND helplist.order_num like CONCAT('%',:orderNum,'%')")
+    List<Map<String, Object>> findServerListByOrderNum(@Param("name")String name,@Param("orderNum") String orderNum, @Param("aId") Integer aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like CONCAT('%',:name,'%') AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId AND wxuser.phone like CONCAT('%',:phone,'%')")
+    List<Map<String, Object>> findServerListByPhone(@Param("name") String name,@Param("phone") String phone,@Param("aId") Integer aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.title like CONCAT('%',:name,'%') AND helplist.state IN (1,2,3,4) AND helplist.a_id=:aId AND helplist.file like CONCAT('%',:fileName,'%')")
+    List<Map<String, Object>> findServerListByFileName(@Param("name") String name,@Param("fileName") String fileName,@Param("aId") Integer aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND  helplist.state IN (1,2,3,4) AND helplist.a_id=:aId AND helplist.order_num like CONCAT('%',:orderNum,'%')")
+    List<Map<String, Object>> findALLByOrderNum(@Param("orderNum") String orderNum,@Param("aId") Integer aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND  helplist.state IN (1,2,3,4) AND helplist.a_id=:aId AND wxuser.phone like CONCAT('%',:phone,'%')")
+    List<Map<String, Object>> findAllByPhone(@Param("phone") String phone,@Param("aId") Integer aId);
 }

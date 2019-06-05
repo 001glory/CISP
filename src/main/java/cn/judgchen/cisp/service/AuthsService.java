@@ -6,4 +6,5 @@ import org.springframework.data.domain.Page;
 public interface AuthsService {
 
     Page<Auths> findAll(Integer page,Integer size);
+
 }

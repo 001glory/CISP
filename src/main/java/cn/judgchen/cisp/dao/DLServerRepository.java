@@ -22,4 +22,6 @@ public interface DLServerRepository extends JpaRepository<DLServer,Long> {
     @Transactional
     @Query(nativeQuery = true,value = "select IFNULL(COUNT(DISTINCT dl_id),0) from dl_server")
     int getTotalJdr();
+
+    DLServer findById(int id);
 }

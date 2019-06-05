@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 
 public interface AreaService {
 
-    Page<Area> getListArea(int pageIndex, int pageSize);
+    Page<Area> getAll(Area area,int page,int size);
 }

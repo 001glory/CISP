@@ -32,4 +32,9 @@ public interface WalletsRepository extends JpaRepository<Wallets,Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Wallets set incomeTotal=:incomeTotal,cash=:cash where uid=:uid")
     void updstate(@Param("uid") int uid,@Param("incomeTotal") double incomeTotal,@Param("cash") double cash);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Wallets set incomeTotal=:uGet where uid=:uid")
+    void updateWallets(@Param("uGet") double uGet,@Param("uid") Integer uid);
 }

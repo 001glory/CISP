@@ -72,4 +72,20 @@ public class AreaController {
             return ApiResponse.fail(ConstanCode.SYSTEM_ERROR);
         }
     }
+
+    @PostMapping("/delete")
+    @LoggerManage(description = "删除校园地区")
+    public ApiResponse deleteArea(String []id){
+        for (int i = 0; i <id.length ; i++) {
+            areaRepository.deleteAreaById(Integer.parseInt(id[i]));
+        }
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "模糊查询")
+    public ApiResponse getAreaList(int page, int size, Area area){
+        Page<Area> areas = areaService.getAll(area,page,size);
+        return ApiResponse.success(areas);
+    }
 }

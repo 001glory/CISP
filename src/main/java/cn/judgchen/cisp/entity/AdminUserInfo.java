@@ -10,7 +10,7 @@ public class AdminUserInfo implements Serializable {
 
     private String username;
 
-    private String user_sate;
+    private String user_state;
 
     private LocalDateTime create_time;
 

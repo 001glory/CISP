@@ -1,8 +1,8 @@
 package cn.judgchen.cisp.service.impl;
 
-import cn.judgchen.cisp.dao.AreaRepository;
-import cn.judgchen.cisp.entity.Area;
-import cn.judgchen.cisp.service.AreaService;
+import cn.judgchen.cisp.dao.LogRepository;
+import cn.judgchen.cisp.entity.Log;
+import cn.judgchen.cisp.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,31 +19,31 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
-public class AreaServiceImpl implements AreaService {
+public class LogServiceImpl implements LogService {
+
 
     @Autowired
-    private AreaRepository areaRepository;
-
+    private LogRepository logRepository;
 
     @Override
-    public Page<Area> getAll(Area area, int page, int size) {
-
+    public Page<Log> getLogs(Log log, Integer page, Integer size) {
         Pageable pageable = new PageRequest(page,size);
-        Specification<Area> spec = new Specification<Area>() {
+        Specification<Log> spec = new Specification<Log>() {
+            List<Predicate> list = new ArrayList<Predicate>();
             @Override
-            public Predicate toPredicate(Root<Area> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
-                List<Predicate> list = new ArrayList<Predicate>();
-                if (!ObjectUtils.isEmpty(area.getName())){
-                    list.add(cb.like(root.get("name").as(String.class),"%"+area.getName()+"%"));
+            public Predicate toPredicate(Root<Log> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                if (!ObjectUtils.isEmpty(log.getUid())){
+                    list.add(cb.equal(root.get("uid").as(Integer.class),log.getUid()));
                 }
-                if (!ObjectUtils.isEmpty((area.getPkId()))){
-                    list.add(cb.equal(root.get("pkId").as(Integer.class),area.getPkId()));
+                if (!ObjectUtils.isEmpty(log.getCreateTime())){
+                    list.add(cb.like(root.get("create_time").as(String.class),"%"+log.getCreateTime()+"%"));
                 }
                 Predicate []p = new Predicate[list.size()];
                 return cb.and(list.toArray(p));
             }
         };
-        return areaRepository.findAll(spec,pageable);
+        return logRepository.findAll(spec,pageable);
     }
 }

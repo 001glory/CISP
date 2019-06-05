@@ -8,6 +8,9 @@ import cn.judgchen.cisp.entity.Role;
 import cn.judgchen.cisp.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +32,18 @@ public class RoleController {
     @LoggerManage(description = "获取角色列表")
     public ApiResponse getList(int page, int size){
 
-        Page<Role> roles = roleService.findAll(page,size);
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"create_time");
+        Page<Role> roles = roleRepository.findAllRoles(pageable);
+
+        return ApiResponse.success(roles);
+    }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "获取角色列表")
+    public ApiResponse getRoleList(String name,int page, int size){
+
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"create_time");
+        Page<Role> roles = roleRepository.findAllRoleByName(name,pageable);
 
         return ApiResponse.success(roles);
     }
@@ -95,13 +109,10 @@ public class RoleController {
 
     @PostMapping("del")
     @LoggerManage(description = "删除角色")
-    public ApiResponse delRole(int id){
-        if (roleRepository.findRoleById(id) != null){
-            roleRepository.deleteRoleById(id);
-
-            return ApiResponse.success();
-        } else {
-            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+    public ApiResponse delRole(String []id){
+        for (int i = 0; i <id.length ; i++) {
+            roleRepository.deleteRole(Integer.parseInt(id[i]));
         }
+        return ApiResponse.success();
     }
 }

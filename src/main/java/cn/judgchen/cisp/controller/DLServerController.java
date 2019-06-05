@@ -4,6 +4,7 @@ package cn.judgchen.cisp.controller;
 import cn.judgchen.cisp.common.aop.LoggerManage;
 import cn.judgchen.cisp.common.code.ConstanCode;
 import cn.judgchen.cisp.common.model.response.ApiResponse;
+import cn.judgchen.cisp.dao.DLServerRepository;
 import cn.judgchen.cisp.entity.DLServer;
 import cn.judgchen.cisp.service.DLServerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class DLServerController {
 
     @Autowired
     private DLServerService dlServerService;
+
+    @Autowired
+    private DLServerRepository dlServerRepository;
 
     @PostMapping("/add")
     @LoggerManage(description = "添加服务")
@@ -48,5 +52,19 @@ public class DLServerController {
     public ApiResponse updateDLIcon(String icon,int dlId){
         dlServerService.updateDLIcon(icon,dlId);
         return ApiResponse.success();
+    }
+
+
+    @PostMapping("/get/detail/id")
+    @LoggerManage(description = "根据服务id获取服务详情")
+    @Transactional
+    public ApiResponse getServerById(int id){
+        DLServer dlServer = dlServerRepository.findById(id);
+        if (dlServer != null){
+            return ApiResponse.success(dlServer);
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+
     }
 }

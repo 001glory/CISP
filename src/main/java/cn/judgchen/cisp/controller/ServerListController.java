@@ -7,17 +7,11 @@ import cn.judgchen.cisp.common.code.ErrorCode;
 import cn.judgchen.cisp.common.model.response.ApiResponse;
 import cn.judgchen.cisp.dao.CapitalTrendrepository;
 import cn.judgchen.cisp.dao.ServerListRepository;
-import cn.judgchen.cisp.entity.AnalysisCount;
-import cn.judgchen.cisp.entity.JdOrder;
-import cn.judgchen.cisp.entity.JdOrderDaily;
-import cn.judgchen.cisp.entity.ServerList;
+import cn.judgchen.cisp.dao.WalletsRepository;
+import cn.judgchen.cisp.entity.*;
 import cn.judgchen.cisp.service.ServerListService;
 import cn.judgchen.cisp.utils.DifferenceTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +35,10 @@ public class ServerListController {
 
     @Autowired
     private CapitalTrendrepository capitalTrendrepository;
+
+
+    @Autowired
+    private WalletsRepository walletsRepository;
 
     @PostMapping("/add")
     @LoggerManage(description = "增加一条服务记录")
@@ -251,9 +249,26 @@ public class ServerListController {
 
     @PostMapping("/confirm")
     @LoggerManage(description = "确认订单")
+    @Transactional
     public ApiResponse confirm(int id){
-        if (serverListRepository.findById(id) != null){
-            LocalDateTime comTime = LocalDateTime.now();
+        ServerList serverList = serverListRepository.findById(id);
+        LocalDateTime comTime = LocalDateTime.now();
+        if (serverList != null){
+            if (capitalTrendrepository.findByHid(id) == null){
+
+                CapitalTrend capitalTrend = new CapitalTrend();
+                capitalTrend.setAId(serverList.getAId());
+                capitalTrend.setAGet(serverList.getTotalFee()*0.2);
+                capitalTrend.setCreateTime(comTime);
+                capitalTrend.setPGet(serverList.getTotalFee()*0.4);
+                capitalTrend.setUGet(serverList.getTotalFee()*0.4);
+                capitalTrend.setUId(serverList.getJdId());
+                capitalTrend.setHId(id);
+                capitalTrendrepository.save(capitalTrend);
+            }
+            CapitalTrend capitalTrend = capitalTrendrepository.findByHid(id);
+            capitalTrendrepository.updateByHid(capitalTrend.getUGet()+serverList.getTotalFee()*0.2,capitalTrend.getPGet()+serverList.getTotalFee()*0.4,capitalTrend.getAGet()+serverList.getTotalFee()*0.4,id);
+            walletsRepository.updateWallets(capitalTrend.getUGet(),serverList.getJdId());
             serverListRepository.confirm(id,comTime);
             return ApiResponse.success();
         } else {
@@ -262,17 +277,69 @@ public class ServerListController {
     }
 
     @PostMapping("/getExpress")
-    @LoggerManage(description = "获取帮助列表")
+    @LoggerManage(description = "获取代取订单列表")
     public ApiResponse getExpress(int aId){
-        List<Map<String,Object>> list = serverListRepository.getExpress(aId);
+        List<Map<String,Object>> list = serverListRepository.getExpress(aId,"代取");
         return ApiResponse.success(list);
     }
 
     @PostMapping("/getPrint")
-    @LoggerManage(description = "获取帮助列表")
+    @LoggerManage(description = "获取打印订单列表")
     public ApiResponse getPrint(int aId){
-        List<Map<String,Object>> list = serverListRepository.getPrint(aId);
+        List<Map<String,Object>> list = serverListRepository.getPrint(aId,"打印");
         return ApiResponse.success(list);
     }
 
+    @PostMapping("delete")
+    @LoggerManage(description = "删除订单")
+    public ApiResponse deleteOrder(String []id){
+        for (int i = 0; i <id.length ; i++) {
+            serverListRepository.deleteServerList(Integer.parseInt(id[i]));
+        }
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/like")
+    @LoggerManage(description = "模糊搜索")
+    public ApiResponse getListBylike(String orderNum,String phone,Integer aId){
+        String name = "快递";
+        if (orderNum != null){
+            List<Map<String,Object>> list = serverListRepository.findServerListByOrderNum(name,orderNum,aId);
+            return ApiResponse.success(list);
+        } else if (phone != null){
+            List<Map<String,Object>> list = serverListRepository.findServerListByPhone(name,phone,aId);
+            return ApiResponse.success(list);
+        } else {
+            return ApiResponse.fail(ConstanCode.SYSTEM_ERROR);
+        }
+    }
+
+    @PostMapping("/like1")
+    @LoggerManage(description = "模糊搜索")
+    public ApiResponse getListByLikePrint(String orderNum,String fileName,Integer aId){
+        String name = "打印";
+        if (orderNum != null){
+            List<Map<String,Object>> list = serverListRepository.findServerListByOrderNum(name,orderNum,aId);
+            return ApiResponse.success(list);
+        } else if (fileName != null){
+            List<Map<String,Object>> list = serverListRepository.findServerListByFileName(name,fileName,aId);
+            return ApiResponse.success(list);
+        } else {
+            return ApiResponse.fail(ConstanCode.SYSTEM_ERROR);
+        }
+    }
+
+    @PostMapping("/like2")
+    @LoggerManage(description = "模糊搜索")
+    public ApiResponse getAllListByLike(String orderNum,String phone,Integer aId){
+        if (orderNum != null){
+            List<Map<String,Object>> list = serverListRepository.findALLByOrderNum(orderNum,aId);
+            return ApiResponse.success(list);
+        } else if (phone != null){
+            List<Map<String,Object>> list = serverListRepository.findAllByPhone(phone,aId);
+            return ApiResponse.success(list);
+        } else {
+            return ApiResponse.fail(ConstanCode.SYSTEM_ERROR);
+        }
+    }
 }
