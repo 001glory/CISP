@@ -126,4 +126,90 @@ public class AddressCateController {
         }
     }
 
+    @PostMapping("/get/info")
+    @LoggerManage(description = "获取所有的地址信息列表")
+    public ApiResponse getAddressInfo(int aId,int page,int size){
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"id");
+
+        Page<AddressInfo> addressInfos = addressInfoRepository.getAreaList(aId,pageable);
+
+        return ApiResponse.success(addressInfos);
+    }
+
+    @PostMapping("/get/cate")
+    @LoggerManage(description = "获取所有的地址信息列表")
+    public ApiResponse getAddressCate(int aId,int page,int size){
+        Pageable pageable = new PageRequest(page,size, Sort.Direction.ASC,"id");
+
+        Page<AddressCate> addressCates = addressCateRepository.getAreaList(aId,pageable);
+
+        return ApiResponse.success(addressCates);
+    }
+
+    @PostMapping("/info/delete")
+    @LoggerManage(description = "获取所有的地址信息列表")
+    public ApiResponse deleteAddressInfo(String []id){
+        for (int i = 0; i <id.length ; i++) {
+            addressInfoRepository.deleteAddressInfo(Integer.parseInt(id[i]));
+        }
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/cate/delete")
+    @LoggerManage(description = "获取所有的地址信息列表")
+    public ApiResponse deleteAddressCate(String []id){
+        for (int i = 0; i <id.length ; i++) {
+            addressCateRepository.deleteAddressInfo(Integer.parseInt(id[i]));
+        }
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/info/add")
+    @LoggerManage(description = "增加地址信息下拉列表")
+    public ApiResponse addAddressInfo(AddressInfo addressInfo){
+        if (addressInfoRepository.findAddressByCateId(addressInfo.getCateId()) == null){
+            addressInfo.setIsDelete(0);
+            addressInfoRepository.save(addressInfo);
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_HAS_EXISTED);
+        }
+
+    }
+
+    @PostMapping("/cate/add")
+    @LoggerManage(description = "增加地址信息下拉列表")
+    public ApiResponse addAddressCate(AddressCate addressCate){
+        if (addressCateRepository.findAddressName(addressCate.getName()) == null){
+            addressCate.setIsDelete(0);
+            addressCate.setIsShow(1);
+            addressCateRepository.save(addressCate);
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_HAS_EXISTED);
+        }
+
+    }
+
+    @PostMapping("/info/update")
+    @LoggerManage(description = "修改地址信息下拉列表")
+    public ApiResponse updateAddressInfo(AddressInfo addressInfo){
+        if (addressInfoRepository.findAddress(addressInfo.getId()) != null){
+            addressInfoRepository.updateAddress(addressInfo.getId(),addressInfo.getCateId(),addressInfo.getName(),addressInfo.getSubName(),addressInfo.getSort());
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+    }
+
+    @PostMapping("/cate/update")
+    @LoggerManage(description = "修改地址信息下拉列表")
+    public ApiResponse updateAddressCate(AddressCate addressCate){
+        if (addressCateRepository.findAddress(addressCate.getId()) != null){
+            addressCateRepository.updateAddress(addressCate.getId(),addressCate.getName(),addressCate.getSort(),addressCate.getIsShow());
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+    }
 }

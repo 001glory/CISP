@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,11 +46,37 @@ public class WalletsController {
         }
     }
 
+    @PostMapping("/get/agent")
+    @LoggerManage(description = "代理查看平台资金数据")
+    public ApiResponse getAgentMoneyData(int aId){
+
+        Map<String,Double> map = new HashMap<>();
+        map.put("aGet",capitalTrendrepository.getAgentTotalAGet(aId));
+        map.put("uGet",capitalTrendrepository.getAgentTotalJDGet(aId));
+        return ApiResponse.success(map);
+    }
+
     @PostMapping("/get2")
-    @LoggerManage(description = "获取每个订单的收支情况")
+    @LoggerManage(description = "代理获取每个订单的收支情况")
     public ApiResponse getAll(int aId){
         List<Map<String,Object>> list = walletsRepository.findAllList(aId);
         return ApiResponse.success(list);
+    }
+
+    @PostMapping("/get2/admin")
+    @LoggerManage(description = "管理员获取每个订单的收支情况")
+    public ApiResponse getAdminAll(){
+        List<Map<String,Object>> list = walletsRepository.findAdminAllList();
+        return ApiResponse.success(list);
+    }
+    @PostMapping("/get/admin")
+    @LoggerManage(description = "管理员查看平台资金数据")
+    public ApiResponse getMoneyData(){
+        Map<String,Double> map = new HashMap<>();
+        map.put("incomeTotal",capitalTrendrepository.getTotalPGet());
+        map.put("aGet",capitalTrendrepository.getTotalAGet());
+        map.put("uGet",capitalTrendrepository.getTotalJDGet());
+        return ApiResponse.success(map);
     }
 
 

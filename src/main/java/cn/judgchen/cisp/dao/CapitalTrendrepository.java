@@ -23,6 +23,23 @@ public interface CapitalTrendrepository extends JpaRepository<CapitalTrend,Long>
     @Query("update CapitalTrend set uGet=:uGet,pGet=:pGet,aGet=:aGet where hId=:id")
     void updateByHid(@Param("uGet") double uGet,@Param("pGet") double pGet,@Param("aGet") double aGet,@Param("id") Integer id);
 
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(p_get),0) from capital_trend")
+    double getTotalPGet();
 
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(a_get),0) from capital_trend")
+    double getTotalAGet();
 
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(u_get),0) from capital_trend")
+    double getTotalJDGet();
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(a_get),0) from capital_trend where a_id=:aId")
+    Double getAgentTotalAGet(@Param("aId") int aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(u_get),0) from capital_trend where a_id=:aId")
+    Double getAgentTotalJDGet(@Param("aId") int aId);
 }

@@ -5,7 +5,9 @@ import cn.judgchen.cisp.common.aop.LoggerManage;
 import cn.judgchen.cisp.common.code.ConstanCode;
 import cn.judgchen.cisp.common.model.response.ApiResponse;
 import cn.judgchen.cisp.dao.DLServerRepository;
+import cn.judgchen.cisp.dao.UserRepository;
 import cn.judgchen.cisp.entity.DLServer;
+import cn.judgchen.cisp.entity.User;
 import cn.judgchen.cisp.service.DLServerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,9 @@ public class DLServerController {
     @Autowired
     private DLServerRepository dlServerRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("/add")
     @LoggerManage(description = "添加服务")
     public ApiResponse addDLServer(DLServer dlServer){
@@ -39,7 +44,8 @@ public class DLServerController {
     @LoggerManage(description = "获取服务列表")
     public ApiResponse getListByUid(int uid){
 
-        List<DLServer> dlServerList = dlServerService.selectDLServer(uid);
+        User user = userRepository.findUserByPkId(uid);
+        List<DLServer> dlServerList = dlServerService.selectDLServer(user.getAId());
         if (dlServerList!=null){
             return ApiResponse.success(dlServerList);
         }
@@ -50,6 +56,7 @@ public class DLServerController {
     @LoggerManage(description = "根据代理id更新头像")
     @Transactional
     public ApiResponse updateDLIcon(String icon,int dlId){
+
         dlServerService.updateDLIcon(icon,dlId);
         return ApiResponse.success();
     }

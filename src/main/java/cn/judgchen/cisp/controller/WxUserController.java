@@ -123,7 +123,7 @@ public class WxUserController {
     }
 
     @PostMapping("/user/getInfo")
-    @LoggerManage(description = "获取userinfo表wx用户的信息")
+    @LoggerManage(description = "小程序获取userinfo表wx用户的信息")
     public ApiResponse getInfo(int wxId) {
         UserInfo userInfo = userInfoRepository.findUserInfoByWxId(wxId);
         if (userInfo != null) {
@@ -136,9 +136,8 @@ public class WxUserController {
     @PostMapping("/getEmer")
     @LoggerManage(description = "获取紧急事件")
     public ApiResponse getEmer(int dlId) {
-        User user = userService.findUserById(dlId);
         Emer emer = new Emer();
-
+        User user = userService.findUserById(dlId);
         emer.setOpenEmer(user.getOpenEmer());
         emer.setEmerTitle(user.getEmerTitle());
         emer.setEmerContent(user.getEmerContent());
@@ -169,7 +168,7 @@ public class WxUserController {
     }
 
     @PostMapping("/get/com")
-    @LoggerManage(description = "获取接单员列表")
+    @LoggerManage(description = "管理员获取接单员列表")
     public ApiResponse getJdList(int page, int size) {
         Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
         Page<WxUser> wxUsers = wxUserRepository.findJDList(pageable);
@@ -177,19 +176,11 @@ public class WxUserController {
     }
 
     @PostMapping("/get/com1")
-    @LoggerManage(description = "获取接单员列表")
-    public ApiResponse getJdList1(Integer id,String nickName,String phone,int page, int size) {
-        if (id != null){
-            Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
-            Page<WxUser> wxUsers = wxUserRepository.findList1(id,pageable);
-            return ApiResponse.success(wxUsers);
-        } else if (nickName != null){
+    @LoggerManage(description = "接单员列表模糊查询")
+    public ApiResponse getJdList1(String nickName,int page, int size) {
+        if (nickName != null){
             Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
             Page<WxUser> wxUsers = wxUserRepository.findList2(nickName,pageable);
-            return ApiResponse.success(wxUsers);
-        } else if (phone != null){
-            Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
-            Page<WxUser> wxUsers = wxUserRepository.findList3(phone,pageable);
             return ApiResponse.success(wxUsers);
         } else {
          return ApiResponse.fail(ConstanCode.SYSTEM_ERROR);
@@ -198,8 +189,10 @@ public class WxUserController {
 
 
     @PostMapping("/user/get2")
-    @LoggerManage(description = "获取所有的微信用户")
+    @LoggerManage(description = "微信用户列表模糊查询")
     public ApiResponse getWxUserListById(Integer id,String nickName,String phone,String gender,int page, int size) {
+
+
         if (id != null){
             Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
 
@@ -216,10 +209,11 @@ public class WxUserController {
             Page<WxUser> wxUsers = wxUserRepository.findList3(phone,pageable);
             return ApiResponse.success(wxUsers);
         } else if (gender != null){
-            Integer gender1;
+            Integer gender1 =0;
             if (gender.equals("男")){
                 gender1 = 1;
-            } else {
+            }
+            if (gender.equals("女")){
                 gender1 = 2;
             }
             Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
@@ -236,6 +230,17 @@ public class WxUserController {
     @PostMapping("/user/get")
     @LoggerManage(description = "获取所有的微信用户")
     public ApiResponse getWxUserList(int page, int size) {
+        Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
+
+        Page<WxUser> wxUsers = wxUserRepository.findList(pageable);
+
+        return ApiResponse.success(wxUsers);
+    }
+
+    //todo
+    @PostMapping("/user/get/todo")
+    @LoggerManage(description = "获取所有的微信用户")
+    public ApiResponse getAgentWxUserList(int page, int size) {
         Pageable pageable = new PageRequest(page, size, Sort.Direction.ASC, "id");
 
         Page<WxUser> wxUsers = wxUserRepository.findList(pageable);
@@ -263,7 +268,7 @@ public class WxUserController {
     }
 
     @PostMapping("/get/review1")
-    @LoggerManage(description = "获取审核列表")
+    @LoggerManage(description = "获取审核列表模糊查询")
     public ApiResponse getReview1(Integer id,String nickName) {
         if (id != null){
             List<Map<String, Object>> list = wxUserRepository.getWxUserInfo1(id);
@@ -322,10 +327,15 @@ public class WxUserController {
     @PostMapping("/user/pass")
     @LoggerManage(description = "审核通过")
     public ApiResponse pass(int id){
-        UserInfo userInfo = userInfoRepository.findUserInfoByWxId(id);
+        UserInfo userInfo = userInfoRepository.findById(id);
         if (userInfo != null){
             wxUserRepository.updateAuthState(userInfo.getWxId());
-            userInfoRepository.updateState(id);
+            userInfoRepository.updateState(userInfo.getWxId());
+            Wallets wallets = new Wallets();
+            wallets.setCreateTime(LocalDateTime.now());
+            wallets.setType(1);
+            wallets.setUid(userInfo.getWxId());
+            walletsRepository.save(wallets);
             return ApiResponse.success();
         } else {
             return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
@@ -335,10 +345,10 @@ public class WxUserController {
     @PostMapping("/user/unpass")
     @LoggerManage(description = "审核不通过")
     public ApiResponse unPass(int id,String msg){
-        UserInfo userInfo = userInfoRepository.findUserInfoByWxId(id);
+        UserInfo userInfo = userInfoRepository.findById(id);
         if (userInfo != null){
             wxUserRepository.updateAuthStates(userInfo.getWxId());
-            userInfoRepository.updateStateMsg(id,msg);
+            userInfoRepository.updateStateMsg(userInfo.getWxId(),msg);
             return ApiResponse.success();
         } else {
             return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);

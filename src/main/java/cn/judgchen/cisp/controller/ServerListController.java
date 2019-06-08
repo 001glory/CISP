@@ -267,8 +267,8 @@ public class ServerListController {
                 capitalTrendrepository.save(capitalTrend);
             }
             CapitalTrend capitalTrend = capitalTrendrepository.findByHid(id);
-            capitalTrendrepository.updateByHid(capitalTrend.getUGet()+serverList.getTotalFee()*0.2,capitalTrend.getPGet()+serverList.getTotalFee()*0.4,capitalTrend.getAGet()+serverList.getTotalFee()*0.4,id);
-            walletsRepository.updateWallets(capitalTrend.getUGet(),serverList.getJdId());
+//            capitalTrendrepository.updateByHid(capitalTrend.getUGet()+serverList.getTotalFee()*0.2,capitalTrend.getPGet()+serverList.getTotalFee()*0.4,capitalTrend.getAGet()+serverList.getTotalFee()*0.4,id);
+            walletsRepository.updateWallets(capitalTrend.getUGet()+serverList.getTotalFee()*0.2,serverList.getJdId());
             serverListRepository.confirm(id,comTime);
             return ApiResponse.success();
         } else {

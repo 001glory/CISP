@@ -38,7 +38,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
 
     @Transactional
-    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0 and y_user.user_state='AVAILABLE' and y_user.pk_id !=:uid and y_user.dtype !=1")
+    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0 and y_user.pk_id !=:uid and y_user.dtype !=1")
     List<Map<String,Object>> getDlServer(@Param("uid") int uid);
 
     @Transactional
@@ -57,10 +57,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
     void deleteUser(@Param("id") int id);
 
     @Transactional
-    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0 and y_user.user_state='AVAILABLE' and y_user.pk_id !=:uid and y_user.dtype !=1 and y_user.username like CONCAT('%',:username,'%')")
+    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0 and y_user.pk_id !=:uid and y_user.dtype !=1 and y_user.username like CONCAT('%',:username,'%')")
     List<Map<String, Object>> getDlServerByName(@Param("uid") int uid,@Param("username") String username);
 
     @Transactional
-    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0 and y_user.user_state='AVAILABLE' and y_user.pk_id !=:uid and y_user.dtype !=1 and y_user.phone like CONCAT('%',:phone,'%')")
+    @Query(nativeQuery = true,value = "select y_user.*,area.name from y_user inner join area on y_user.a_id=area.pk_id where y_user.is_delete=0  and y_user.pk_id !=:uid and y_user.dtype !=1 and y_user.phone like CONCAT('%',:phone,'%')")
     List<Map<String, Object>> getDlServerByPhone(@Param("uid") int uid,@Param("phone") String phone);
 }

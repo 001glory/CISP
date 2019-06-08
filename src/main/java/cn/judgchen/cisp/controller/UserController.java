@@ -3,6 +3,7 @@ package cn.judgchen.cisp.controller;
 
 import cn.judgchen.cisp.common.aop.LoggerManage;
 import cn.judgchen.cisp.common.code.ConstanCode;
+import cn.judgchen.cisp.common.code.ErrorCode;
 import cn.judgchen.cisp.common.model.response.ApiResponse;
 import cn.judgchen.cisp.dao.UserRepository;
 import cn.judgchen.cisp.dao.WalletsRepository;
@@ -50,33 +51,39 @@ public class UserController {
     @PostMapping("/register")
     @LoggerManage(description = "添加代理")
     public ApiResponse register(String username, int aid, int dtype, String phone, Date deadLine) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        if(userService.selectUserByUsername(username)==null){
-            User user = new User();
-            user.setUsername(username);
-            LocalDateTime register_time = LocalDateTime.now();
-            user.setPwd(MyMD5Util.getEncryptedPwd("123456"));
-            user.setAId(aid);
-            user.setDtype(dtype);
-            user.setPhone(phone);
-            user.setUserState("AVAILABLE");
-            Instant instant = deadLine.toInstant();
-            ZoneId zoneId = ZoneId.systemDefault();
+        if (userRepository.findUserByAId(aid) == null){
+            if(userService.selectUserByUsername(username)==null){
+                User user = new User();
+                user.setUsername(username);
+                LocalDateTime register_time = LocalDateTime.now();
+                user.setPwd(MyMD5Util.getEncryptedPwd("123456"));
+                user.setAId(aid);
+                user.setDtype(dtype);
+                user.setPhone(phone);
+                user.setUserState("AVAILABLE");
+                Instant instant = deadLine.toInstant();
+                ZoneId zoneId = ZoneId.systemDefault();
 
-            user.setIsDelete(0);
-            LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-            user.setDeadline(localDateTime);
-            user.setCreateTime(register_time);
-            user.setModifyTime(register_time);
-            userService.addUser(user);
-            User user1 = userRepository.findUserByUsername(username);
-            Wallets wallets = new Wallets();
-            wallets.setUid(user1.getPkId());
-            wallets.setType(2);
-            walletsRepository.save(wallets);
-            return ApiResponse.success();
-        }else {
-            return ApiResponse.fail(ConstanCode.USER_HAS_REGISTERED);
+                user.setIsDelete(0);
+                LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+                user.setDeadline(localDateTime);
+                user.setCreateTime(register_time);
+                user.setModifyTime(register_time);
+                userService.addUser(user);
+                User user1 = userRepository.findUserByUsername(username);
+                Wallets wallets = new Wallets();
+                wallets.setUid(user1.getPkId());
+                wallets.setCreateTime(LocalDateTime.now());
+                wallets.setType(2);
+                walletsRepository.save(wallets);
+                return ApiResponse.success();
+            }else {
+                return ApiResponse.fail(ConstanCode.USER_HAS_REGISTERED);
+            }
+        } else {
+            return ApiResponse.fail(new ErrorCode(100,"该地区已有代理商"));
         }
+
 
     }
     @PostMapping("/delete")
@@ -150,7 +157,12 @@ public class UserController {
     @LoggerManage(description = "根据aid获取用户信息")
     public ApiResponse getInfoByAid(int aid){
         User user = userService.findUserByAId(aid);
-        return ApiResponse.success(user);
+        if (user != null){
+            return ApiResponse.success(user);
+        } else {
+            return ApiResponse.fail(ConstanCode.RECORD_DOES_NOT_EXIST);
+        }
+
     }
 
     @PostMapping("/getEmer")
@@ -190,14 +202,14 @@ public class UserController {
     }
 
     @PostMapping("/get/info")
-    @LoggerManage(description = "pc端获取代理用户信息")
+    @LoggerManage(description = "pc端获取代理列表信息")
     public ApiResponse getServerInfo(int uid){
         List<Map<String,Object>> users = userRepository.getDlServer(uid);
         return ApiResponse.success(users);
     }
 
     @PostMapping("/get/like")
-    @LoggerManage(description = "pc端获取代理用户信息")
+    @LoggerManage(description = "模糊查询")
     public ApiResponse getServerList(String username,String phone,int uid){
         if (username != null){
             List<Map<String,Object>> users = userRepository.getDlServerByName(uid,username);
@@ -211,7 +223,7 @@ public class UserController {
     }
 
     @PostMapping("/update/state/disable")
-    @LoggerManage(description = "是否禁用用户")
+    @LoggerManage(description = "禁用用户")
     public ApiResponse updateUserSate(String []pkId){
         for (int i = 0; i< pkId.length;i++){
             userRepository.updateUserSate(Integer.parseInt(pkId[i]));

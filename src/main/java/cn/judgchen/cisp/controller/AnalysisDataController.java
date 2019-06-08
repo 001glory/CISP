@@ -26,6 +26,9 @@ public class AnalysisDataController {
     @Autowired
     private AreaRepository areaRepository;
 
+    @Autowired
+    private UserInfoRepository userInfoRepository;
+
     @PostMapping("/getData")
     @Transactional
     @LoggerManage(description = "查询e_chart的数据")
@@ -42,9 +45,29 @@ public class AnalysisDataController {
         analysisData.setTurnoverMonth(serverListRepository.getMonthSale());
         analysisData.setTurnoverYear(serverListRepository.getYearSale());
         analysisData.setDailyUser(wxUserRepository.getDailyUser());
+        analysisData.setUserWating(userInfoRepository.getWaitUser());
+        analysisData.setUserBack(userInfoRepository.getBackUser());
 
         return ApiResponse.success(analysisData);
     }
 
 
+    @PostMapping("/agent/getData")
+    @Transactional
+    @LoggerManage(description = "查询代理的e_chart数据")
+    public ApiResponse getAgentAnalysisData(int aId){
+
+        AnalysisData analysisData = new AnalysisData();
+
+        analysisData.setUserPass(userInfoRepository.getTotal());
+        analysisData.setOrderTotal(serverListRepository.getAgentTotalOrder(aId));
+        analysisData.setTurnover(serverListRepository.getAgentTotalSale(aId));
+        analysisData.setTurnoverDaily(serverListRepository.getAgentDailySale(aId));
+        analysisData.setTurnoverMonth(serverListRepository.getAgentMonthSale(aId));
+        analysisData.setTurnoverYear(serverListRepository.getAgentYearSale(aId));
+        analysisData.setUserWating(userInfoRepository.getAgentWaitUser(aId));
+        analysisData.setUserBack(userInfoRepository.getAgentBackUser(aId));
+
+        return ApiResponse.success(analysisData);
+    }
 }

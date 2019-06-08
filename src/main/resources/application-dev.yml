@@ -18,19 +18,19 @@ server:
   port: 81
   servlet:
     context-path: /cisp/
-file:
-  path: D:/img/
-  sonPath: /img/
 #file:
-#  path: /usr/img/
+#  path: D:/img/
 #  sonPath: /img/
+file:
+  path: /usr/img/
+  sonPath: /img/
 
 
-#img:
-#  local:
-#    path: /usr/img/
-#  Host: http://47.103.7.106:80/cisp
 img:
   local:
-    path: D:/img/
-  Host: http://localhost:8080/cisp
+    path: /usr/img/
+  Host: http://47.103.7.106:80/cisp
+#img:
+#  local:
+#    path: D:/img/
+#  Host: http://localhost:8080/cisp

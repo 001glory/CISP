@@ -12,6 +12,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
 
     UserInfo findUserInfoByWxId(int wxId);
 
+    UserInfo findById(int id);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update UserInfo set name=:name,cardNum=:cardNum,cert=:cert,stuCard=:stuCard,aId=:aId where wxId=:wxId")
@@ -31,4 +33,25 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
     @Modifying(clearAutomatically = true)
     @Query("update UserInfo set state=2,msg=:msg where wxId=:wxId")
     void updateStateMsg(@Param("wxId") int id,@Param("msg") String msg);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(COUNT(DISTINCT id),0) from userinfo where state=1")
+    Integer getTotal();
+    
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(COUNT(id),0) from userinfo where state=0 and card_num is not null")
+    Integer getWaitUser();
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(COUNT(id),0) from userinfo where state=2 and card_num is not null")
+    Integer getBackUser();
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(COUNT(id),0) from userinfo where state=0 and card_num is not null and a_id=:aId")
+    Integer getAgentWaitUser(@Param("aId") int aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(COUNT(id),0) from userinfo where state=2 and card_num is not null and a_id=:aId")
+    Integer getAgentBackUser(int aId);
 }

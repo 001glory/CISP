@@ -37,4 +37,8 @@ public interface WalletsRepository extends JpaRepository<Wallets,Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Wallets set incomeTotal=:uGet where uid=:uid")
     void updateWallets(@Param("uGet") double uGet,@Param("uid") Integer uid);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select capital_trend.*,helplist.order_num,helplist.total_fee from capital_trend inner join helplist on capital_trend.h_id = helplist.id")
+    List<Map<String, Object>> findAdminAllList();
 }

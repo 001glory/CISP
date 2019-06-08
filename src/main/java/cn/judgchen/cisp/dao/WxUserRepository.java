@@ -53,7 +53,7 @@ public interface WxUserRepository extends JpaRepository<WxUser,Long> {
 
 
     @Transactional
-    @Query(nativeQuery = true,value = "select * from wxuser where nick_name like CONCAT('%',:name,'%')")
+    @Query(nativeQuery = true,value = "select * from wxuser where nick_name like CONCAT('%',:name,'%') and auth=1")
     Page<WxUser> findList2(@Param("name") String name,Pageable pageable);
 
     @Transactional
@@ -63,11 +63,11 @@ public interface WxUserRepository extends JpaRepository<WxUser,Long> {
 
 
     @Transactional
-    @Query(nativeQuery = true,value = "select wxuser.*,userinfo.name,userinfo.card_num,userinfo.cert,userinfo.stu_card,userinfo.id s_id,userinfo.state,userinfo.msg from wxuser inner join userinfo on wxuser.id = userinfo.wx_id where userinfo.name is not null ")
+    @Query(nativeQuery = true,value = "select wxuser.*,userinfo.name,userinfo.card_num,userinfo.cert,userinfo.stu_card,userinfo.id s_id,userinfo.state,userinfo.msg from wxuser inner join userinfo on wxuser.id = userinfo.wx_id where userinfo.name is not null")
     List<Map<String,Object>> getWxUserInfo();
 
     @Transactional
-    @Query(nativeQuery = true,value = "select wxuser.*,userinfo.name,userinfo.card_num,userinfo.cert,userinfo.stu_card,userinfo.id s_id,userinfo.state,userinfo.msg from wxuser inner join userinfo on wxuser.id = userinfo.wx_id where userinfo.name is not null and userinfo.wx_id=:id ")
+    @Query(nativeQuery = true,value = "select wxuser.*,userinfo.name,userinfo.card_num,userinfo.cert,userinfo.stu_card,userinfo.id s_id,userinfo.state,userinfo.msg from wxuser inner join userinfo on wxuser.id = userinfo.wx_id where userinfo.name is not null and userinfo.wx_id=:id and userinfo.state=1")
     List<Map<String,Object>> getWxUserInfo1(@Param("id") int id);
 
     @Transactional

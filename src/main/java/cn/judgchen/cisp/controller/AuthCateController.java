@@ -33,7 +33,7 @@ public class AuthCateController {
     }
 
     @PostMapping("/update")
-    @LoggerManage(description = "添加一条权限类目记录")
+    @LoggerManage(description = "修改限类目记录")
     public ApiResponse updateAuthCate(int id, String cateName,int isShow,int sort,String remarks){
         if(authCateRepository.findAuthCateById(id) != null){
             authCateRepository.updateAll(id,cateName,isShow,sort,remarks);

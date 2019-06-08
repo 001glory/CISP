@@ -29,25 +29,46 @@ public interface ServerListRepository extends JpaRepository<ServerList,Long>, Jp
     int updateState(@Param("state") int state, @Param("isPay") int isPay, @Param("id") int id);
 
     @Transactional
-    @Query(nativeQuery = true,value = "SELECT IFNULL(COUNT(order_num),0) FROM helplist")
+    @Query(nativeQuery = true,value = "SELECT IFNULL(COUNT(order_num),0) FROM helplist where is_delete=0")
     int getTotalOrder();
 
+    @Transactional
+    @Query(nativeQuery = true,value = "SELECT IFNULL(COUNT(order_num),0) FROM helplist where is_delete=0 and a_id=:aId")
+    int getAgentTotalOrder(@Param("aId") int aId);
+
 
     @Transactional
-    @Query(nativeQuery = true,value = "SELECT IFNULL(sum(total_fee),0.00) FROM helplist WHERE is_pay=1 and state in (1,2,3)")
+    @Query(nativeQuery = true,value = "SELECT IFNULL(sum(total_fee),0.00) FROM helplist WHERE is_pay=1 and state in (1,2,3) and is_delete=0")
     long getTotalSale();
 
+
     @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and to_days(create_time) = to_days(now())")
+    @Query(nativeQuery = true,value = "SELECT IFNULL(sum(total_fee),0.00) FROM helplist WHERE is_pay=1 and state in (1,2,3) and is_delete=0 and a_id=:aId")
+    long getAgentTotalSale(@Param("aId") int aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and is_delete=0 and to_days(create_time) = to_days(now())")
     double getDailySale();
 
     @Transactional
-    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and DATE_FORMAT( create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )")
+    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and  is_delete=0 and a_id=:aId and to_days(create_time) = to_days(now())")
+    double getAgentDailySale(@Param("aId") int aId);
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and is_delete=0 and DATE_FORMAT( create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )")
     double  getMonthSale();
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1  and is_delete=0 and a_id=:aId and DATE_FORMAT( create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )")
+    double  getAgentMonthSale(@Param("aId") int aId);
 
     @Transactional
     @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_pay=1 and YEAR(create_time)=YEAR(NOW())")
     double getYearSale();
+
+    @Transactional
+    @Query(nativeQuery = true,value = "select IFNULL(sum(total_fee),0.00) from helplist where state in (1,2,3) and is_delete=0 and a_id=:aId and is_pay=1 and YEAR(create_time)=YEAR(NOW())")
+    double getAgentYearSale(@Param("aId") int aId);
 
     @Transactional
     @Query(nativeQuery = true,value = "SELECT helplist.*,wxuser.phone,wxuser.dphone,wxuser.avatar_url,wxuser.nick_name FROM helplist INNER JOIN wxuser ON helplist.wx_id = wxuser.id WHERE helplist.is_delete=0 AND helplist.state in (1,2,3) AND helplist.wx_id=:wxId")
